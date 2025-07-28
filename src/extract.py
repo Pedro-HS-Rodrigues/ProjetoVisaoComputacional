@@ -1,14 +1,42 @@
+import cv2
 import easyocr
 
-# Inicializar o leitor EasyOCR
-reader = easyocr.Reader(['en'])
+def extract(image_path):
+    
+    reader = easyocr.Reader(['en'])
 
-# Carregar a imagem da placa de carro (já recortada)
-image_path = 'src/cropped/image6.jpg'
+    
+    img = cv2.imread(image_path)
 
-# Realizar OCR
-result = reader.readtext(image_path)
+    
+    window_name = "Imagem Original"
+    cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+    cv2.resizeWindow(window_name, 400, 200)
+    cv2.imshow(window_name, img)
+    cv2.waitKey(3000)
+    cv2.destroyAllWindows()
 
-# Exibir o texto extraído
-for detection in result:
-    print(f"Texto detectado: {detection[1]}")
+    
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    
+    window_name = "Escala de Cinza"
+    cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+    cv2.resizeWindow(window_name, 400, 200)
+    cv2.imshow(window_name, gray)
+    cv2.waitKey(3000)
+    cv2.destroyAllWindows()
+
+    
+    result = reader.readtext(gray)
+
+    
+    valid_texts = []
+
+    for detection in result:
+        texto = detection[1].replace(" ", "") 
+        texto = texto.replace("(", "").replace(")", "").replace("!", "").replace("/", "").replace("|", "").replace(":", "")
+        if len(texto) == 7: 
+            valid_texts.append(texto)
+
+    return valid_texts 
